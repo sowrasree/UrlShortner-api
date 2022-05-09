@@ -1,0 +1,49 @@
+version: '3.8'
+services:
+  database:
+    image: postgres:14.2-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: dummy
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5432:5432"
+    # volumes:
+    #   - ../fyle-platform-api/dev/postgres/migrations:/tmp/migrations:ro
+  api:
+    # image: UrlShortner-api
+    build: .
+    restart: unless-stopped
+    environment:
+      PGUSER: postgres
+      PGPASSWORD: postgres
+      PGHOST: database
+      PGPORT: 5432
+      PGDATABASE: dummy
+    # env_file:
+    #   - secrets/db.env
+    #   - secrets/rabbitmq.env
+    #   - secrets/aws.env
+    #   - secrets/public.env
+    #   - secrets/twilio.env
+    #   - secrets/envtype.env
+    #   - secrets/visa.env
+    command: ["bash", "-c", "bash api/run.sh"]
+    # volumes:
+    #   - ../fyle-platform-api/core:/fyle-platform-api/core:ro
+    #   - ../fyle-platform-api/api:/fyle-platform-api/api:ro
+    #   - ../fyle-platform-api/tests:/fyle-platform-api/tests:ro
+    #   - ../fyle-platform-api/fyle-platform-docs:/fyle-platform-api/fyle-platform-docs:ro
+    #   - ../fyle-platform-api/test_reports:/fyle-platform-api/test_reports:rw
+    #   - ../fyle-platform-api/workers:/fyle-platform-api/workers:ro
+    ports:
+      - "8421:8421"
+    # healthcheck:
+    #   test: ["CMD", "curl", "-f", "http://localhost:8421/ready"]
+    #   interval: 1m30s
+    #   timeout: 10s
+    #   retries: 3
+    #   start_period: 40s
+    # depends_on:
+    #   - database
